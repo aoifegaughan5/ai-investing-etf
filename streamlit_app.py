@@ -35,8 +35,11 @@ risk_level = st.selectbox(
 
 # Find Best ETF button on their selected risk level 
 if st.button("Find Best ETF (ticker)"):
-    top_etf = picking_top_etf(st.session_state.selected_risk, exclude_etfs=st.session_state.selected_etfs[st.session_state.selected_risk])
-    if top_etf:
+    top_etf = picking_top_etf(
+        st.session_state.selected_risk,
+        exclude_etfs=st.session_state.selected_etfs[st.session_state.selected_risk]
+    )
+    if isinstance(top_etf, dict):
         # Append the ticker to the list corresponding to the selected risk level
         st.session_state.selected_etfs[st.session_state.selected_risk].append(top_etf["ETF"])
         st.session_state.top_etf = top_etf
@@ -45,7 +48,7 @@ if st.button("Find Best ETF (ticker)"):
         st.error("There are no more ETFs available for this risk level. Please try another.")
 
 # Display selected ETF details if available
-if st.session_state.top_etf:
+if st.session_state.top_etf and isinstance(st.session_state.top_etf, dict):
     top_etf = st.session_state.top_etf
     # The success message now shows the ETF ticker and its Sharpe Ratio.
     st.success(
@@ -61,11 +64,14 @@ if st.button("Check Another ETF in the Same Risk Level"):
     if len(st.session_state.selected_etfs[st.session_state.selected_risk]) >= len(ETF[st.session_state.selected_risk]):
         st.error("You've already checked all available ETFs in this category!")
     else:
-        new_etf = picking_top_etf(st.session_state.selected_risk, exclude_etfs=st.session_state.selected_etfs[st.session_state.selected_risk])
-        if new_etf:
+        new_etf = picking_top_etf(
+            st.session_state.selected_risk,
+            exclude_etfs=st.session_state.selected_etfs[st.session_state.selected_risk]
+        )
+        if isinstance(new_etf, dict):
             st.session_state.selected_etfs[st.session_state.selected_risk].append(new_etf["ETF"])
             st.session_state.top_etf = new_etf
-            st.rerun()  # Refresh UI to update ETF selection
+            st.rerun()  # Refresh UI to update ETF selection.
         else:
             st.error("No new ETF found.")
 
